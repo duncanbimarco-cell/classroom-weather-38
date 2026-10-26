@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>课堂心情气象站 (38人版)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .weather-card { transition: all 0.2s ease; }
+    .weather-card:hover { transform: translateY(-4px); }
+    .student-btn { transition: all 0.15s ease; }
+    .student-btn:active { transform: scale(0.95); }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-12">
+
+  <!-- 顶部导航与标题 -->
+  <header class="bg-white shadow-sm sticky top-0 z-10">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">🌤️</span>
+        <div>
+          <h1 class="text-xl font-bold text-slate-900">课堂心情气象站</h1>
+          <p class="text-xs text-slate-500">1-38号同学 课前 & 课后状态收集与对比</p>
+        </div>
+      </div>
+
+      <!-- 阶段切换按钮 -->
+      <div class="flex bg-slate-100 p-1 rounded-xl">
+        <button onclick="switchTab('pre')" id="tab-pre" class="px-4 py-2 rounded-lg text-sm font-medium transition-all bg-blue-600 text-white shadow-sm">
+          🔔 课前收集 <span id="badge-pre" class="ml-1 px-1.5 py-0.5 text-xs bg-blue-500 rounded-full">0/38</span>
+        </button>
+        <button onclick="switchTab('post')" id="tab-post" class="px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900">
+          🎉 课后收集 <span id="badge-post" class="ml-1 px-1.5 py-0.5 text-xs bg-slate-200 text-slate-700 rounded-full">0/38</span>
+        </button>
+        <button onclick="switchTab('stats')" id="tab-stats" class="px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900">
+          📊 数据统计看板
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 mt-6">
+    
+    <!-- 收集视图（课前/课后共用） -->
+    <div id="view-collect" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- 左侧：38个学号网格 -->
+      <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-bold flex items-center gap-2">
+            <span id="phase-title" class="text-blue-600">【课前阶段】</span> 请先点击你的学号：
+          </h2>
+          <div class="flex items-center gap-3 text-xs text-slate-500">
+            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> 已选</span>
+            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-slate-200 inline-block"></span> 未选</span>
+          </div>
+        </div>
+
+        <div id="student-grid" class="grid grid-cols-5 sm:grid-cols-8 gap-2.5">
+          <!-- JS 动态生成 1-38 号按钮 -->
+        </div>
+      </div>
+
+      <!-- 右侧：5个天气选项面板 -->
+      <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+            <div>
+              <p class="text-xs text-slate-400">当前选中学号</p>
+              <h3 id="selected-student-display" class="text-2xl font-extrabold text-blue-600">1 号同学</h3>
+            </div>
+            <div id="current-choice-tag" class="text-sm px-3 py-1 rounded-full bg-slate-100 text-slate-500">
+              尚未选择
+            </div>
+          </div>
+
+          <p class="text-sm font-medium text-slate-700 mb-3">请选择代表你此刻心情的天气图标：</p>
+
+          <!-- 5个天气卡片 -->
+          <div id="weather-options" class="space-y-3">
+            <!-- JS 动态渲染 5 个图文选项 -->
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+          <span>💡 点击天气卡片即自动保存，并自动跳到下一位未填学号</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 数据统计视图 -->
+    <div id="view-stats" class="hidden space-y-6">
+      
+      <!-- 顶部统计概览与操作栏 -->
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex flex-wrap gap-6">
+          <div>
+            <p class="text-xs text-slate-400">课前完成人数</p>
+            <p id="stat-pre-count" class="text-2xl font-bold text-blue-600">0 / 38</p>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400">课后完成人数</p>
+            <p id="stat-post-count" class="text-2xl font-bold text-emerald-600">0 / 38</p>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400">心情变好 / 保持晴朗彩虹</p>
+            <p id="stat-improved-count" class="text-2xl font-bold text-amber-500">0 人</p>
+          </div>
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="exportCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-xl shadow-sm transition flex items-center gap-1.5">
+            📥 导出 Excel (CSV) 统计表
+          </button>
+          <button onclick="resetAllData()" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-sm font-medium rounded-xl transition">
+            🗑️ 清空重置数据
+          </button>
+        </div>
+      </div>
+
+      <!-- 图表对比区 -->
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+        <h3 class="text-base font-bold mb-4">📈 课前 vs 课后 天气选项人数分布对比</h3>
+        <div class="h-72 w-full">
+          <canvas id="comparisonChart"></canvas>
+        </div>
+      </div>
+
+      <!-- 38人详细对比表 -->
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <h3 class="text-base font-bold mb-4">📋 1-38号同学 课前与课后详细数据表</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="bg-slate-50 text-slate-600 border-b border-slate-200">
+                <th class="py-3 px-4 font-semibold">学号</th>
+                <th class="py-3 px-4 font-semibold">课前选择</th>
+                <th class="py-3 px-4 font-semibold">课后选择</th>
+                <th class="py-3 px-4 font-semibold">状态变化趋势</th>
+              </tr>
+            </thead>
+            <tbody id="detail-table-body" class="divide-y divide-slate-100">
+              <!-- JS 渲染 38 行数据 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const TOTAL_STUDENTS = 38;
+    const STORAGE_KEY = 'classroom_weather_survey_38_v1';
+
+    // 5个天气选项定义（含高表现力 SVG 图案）
+    const WEATHER_OPTIONS = [
+      {
+        id: 1,
+        name: '暴风雨',
+        desc: '焦虑 / 烦躁 / 压力很大',
+        emoji: '⛈️',
+        color: 'from-slate-700 to-slate-900 text-white',
+        badgeClass: 'bg-slate-800 text-white',
+        svg: `<svg class="w-10 h-10" viewBox="0 0 64 64" fill="none"><path d="M46 26C46 18.268 39.732 12 32 12C25.39 12 19.85 16.57 18.39 22.72C13.62 23.47 10 27.59 10 32.5C10 37.99 14.5 42.5 20 42.5H45C50.52 42.5 55 38.02 55 32.5C55 27.35 50.89 23.16 45.8 23.01" fill="#475569"/><path d="M33 38L25 50H33L29 60L41 46H33L33 38Z" fill="#FACC15"/></svg>`
+      },
+      {
+        id: 2,
+        name: '多云',
+        desc: '有点闷闷的 / 疲惫 / 提不起劲',
+        emoji: '☁️',
+        color: 'from-slate-200 to-slate-300 text-slate-800',
+        badgeClass: 'bg-slate-300 text-slate-800',
+        svg: `<svg class="w-10 h-10" viewBox="0 0 64 64" fill="none"><path d="M48 30C48 21.16 40.84 14 32 14C24.5 14 18.2 19.16 16.47 26.13C11.12 26.9 7 31.47 7 37C7 43.08 11.92 48 18 48H47C53.08 48 58 43.08 58 37C58 31.25 53.58 26.54 47.95 26.05" fill="#94A3B8"/></svg>`
+      },
+      {
+        id: 3,
+        name: '晴转多云',
+        desc: '平静 / 普通 / 还算正常',
+        emoji: '⛅',
+        color: 'from-sky-100 to-amber-100 text-slate-800',
+        badgeClass: 'bg-sky-100 text-sky-800',
+        svg: `<svg class="w-10 h-10" viewBox="0 0 64 64" fill="none"><circle cx="24" cy="24" r="10" fill="#FBBF24"/><path d="M48 34C48 26.82 42.18 21 35 21C28.9 21 23.78 25.2 22.38 30.86C18.03 31.48 14.68 35.2 14.68 39.69C14.68 44.63 18.68 48.63 23.62 48.63H47.18C52.12 48.63 56.12 44.63 56.12 39.69C56.12 35.02 52.53 31.19 47.96 30.8" fill="#CBD5E1"/></svg>`
+      },
+      {
+        id: 4,
+        name: '晴朗',
+        desc: '开心 / 专注 / 状态不错',
+        emoji: '☀️',
+        color: 'from-amber-200 to-orange-200 text-amber-950',
+        badgeClass: 'bg-amber-200 text-amber-900',
+        svg: `<svg class="w-10 h-10" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="14" fill="#F59E0B"/><path d="M32 8V14M32 50V56M8 32H14M50 32H56M15 15L19.5 19.5M44.5 44.5L49 49M49 15L44.5 19.5M19.5 44.5L15 49" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/></svg>`
+      },
+      {
+        id: 5,
+        name: '彩虹',
+        desc: '超级棒 / 充满能量 / 收获满满',
+        emoji: '🌈',
+        color: 'from-pink-200 via-amber-100 to-cyan-200 text-slate-900',
+        badgeClass: 'bg-gradient-to-r from-pink-500 to-cyan-500 text-white',
+        svg: `<svg class="w-10 h-10" viewBox="0 0 64 64" fill="none"><path d="M10 46C10 33.85 19.85 24 32 24C44.15 24 54 33.85 54 46" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/><path d="M14 46C14 36.06 22.06 28 32 28C41.94 28 50 36.06 50 46" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/><path d="M18 46C18 38.27 24.27 32 32 32C39.73 32 46 38.27 46 46" stroke="#10B981" stroke-width="4" stroke-linecap="round"/><path d="M22 46C22 40.48 26.48 36 32 36C37.52 36 42 40.48 42 46" stroke="#3B82F6" stroke-width="4" stroke-linecap="round"/></svg>`
+      }
+    ];
+
+    // 状态管理
+    let currentTab = 'pre'; // 'pre' | 'post' | 'stats'
+    let selectedStudent = 1;
+    let surveyData = loadData();
+    let chartInstance = null;
+
+    function loadData() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        try { return JSON.parse(raw); } catch (e) {}
+      }
+      const init = { pre: {}, post: {} };
+      return init;
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(surveyData));
+      updateBadges();
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      const btnPre = document.getElementById('tab-pre');
+      const btnPost = document.getElementById('tab-post');
+      const btnStats = document.getElementById('tab-stats');
+
+      // 重置样式
+      [btnPre, btnPost, btnStats].forEach(b => {
+        b.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900";
+      });
+
+      if (tab === 'pre') {
+        btnPre.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all bg-blue-600 text-white shadow-sm";
+        document.getElementById('phase-title').textContent = '【课前阶段】';
+        document.getElementById('phase-title').className = 'text-blue-600';
+        document.getElementById('view-collect').classList.remove('hidden');
+        document.getElementById('view-stats').classList.add('hidden');
+        renderCollectView();
+      } else if (tab === 'post') {
+        btnPost.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-sm";
+        document.getElementById('phase-title').textContent = '【课后阶段】';
+        document.getElementById('phase-title').className = 'text-emerald-600';
+        document.getElementById('view-collect').classList.remove('hidden');
+        document.getElementById('view-stats').classList.add('hidden');
+        renderCollectView();
+      } else {
+        btnStats.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all bg-indigo-600 text-white shadow-sm";
+        document.getElementById('view-collect').classList.add('hidden');
+        document.getElementById('view-stats').classList.remove('hidden');
+        renderStatsView();
+      }
+      updateBadges();
+    }
+
+    function updateBadges() {
+      const preCount = Object.keys(surveyData.pre).length;
+      const postCount = Object.keys(surveyData.post).length;
+      document.getElementById('badge-pre').textContent = `${preCount}/${TOTAL_STUDENTS}`;
+      document.getElementById('badge-post').textContent = `${postCount}/${TOTAL_STUDENTS}`;
+    }
+
+    function selectStudent(num) {
+      selectedStudent = num;
+      renderCollectView();
+    }
+
+    function chooseWeather(weatherId) {
+      surveyData[currentTab][selectedStudent] = weatherId;
+      saveData();
+
+      // 自动跳到下一个还没选的学号
+      for (let i = 1; i <= TOTAL_STUDENTS; i++) {
+        const nextNum = ((selectedStudent + i - 1) % TOTAL_STUDENTS) + 1;
+        if (!surveyData[currentTab][nextNum]) {
+          selectedStudent = nextNum;
+          break;
+        }
+      }
+      renderCollectView();
+    }
+
+    function renderCollectView() {
+      const grid = document.getElementById('student-grid');
+      grid.innerHTML = '';
+      const phaseData = surveyData[currentTab];
+
+      for (let i = 1; i <= TOTAL_STUDENTS; i++) {
+        const chosenId = phaseData[i];
+        const chosenWeather = WEATHER_OPTIONS.find(w => w.id === chosenId);
+        const isCurrent = (i === selectedStudent);
+
+        const btn = document.createElement('button');
+        let baseClass = "student-btn h-14 rounded-xl flex flex-col items-center justify-center font-bold border-2 ";
+
+        if (isCurrent) {
+          baseClass += "border-blue-600 ring-2 ring-blue-300 bg-blue-50 text-blue-700 ";
+        } else if (chosenWeather) {
+          baseClass += "border-emerald-500 bg-emerald-50 text-emerald-800 ";
+        } else {
+          baseClass += "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 ";
+        }
+
+        btn.className = baseClass;
+        btn.onclick = () => selectStudent(i);
+        btn.innerHTML = `
+          <span class="text-sm">${i}号</span>
+          <span class="text-base leading-none mt-0.5">${chosenWeather ? chosenWeather.emoji : '·'}</span>
+        `;
+        grid.appendChild(btn);
+      }
+
+      // 更新右侧当前学号与天气选项
+      document.getElementById('selected-student-display').textContent = `${selectedStudent} 号同学`;
+      const currentWeatherId = phaseData[selectedStudent];
+      const currentWeather = WEATHER_OPTIONS.find(w => w.id === currentWeatherId);
+      const tagEl = document.getElementById('current-choice-tag');
+
+      if (currentWeather) {
+        tagEl.textContent = `已选：${currentWeather.emoji} ${currentWeather.name}`;
+        tagEl.className = `text-sm px-3 py-1 rounded-full font-medium ${currentWeather.badgeClass}`;
+      } else {
+        tagEl.textContent = '尚未选择';
+        tagEl.className = 'text-sm px-3 py-1 rounded-full bg-slate-100 text-slate-500';
+      }
+
+      const optionsContainer = document.getElementById('weather-options');
+      optionsContainer.innerHTML = '';
+
+      WEATHER_OPTIONS.forEach(w => {
+        const isSelected = (currentWeatherId === w.id);
+        const card = document.createElement('div');
+        card.onclick = () => chooseWeather(w.id);
+        card.className = `weather-card cursor-pointer p-3.5 rounded-2xl bg-gradient-to-r ${w.color} flex items-center justify-between border-2 ${isSelected ? 'border-blue-600 ring-2 ring-blue-400' : 'border-transparent'}`;
+        card.innerHTML = `
+          <div class="flex items-center gap-3.5">
+            <div class="bg-white/80 p-1.5 rounded-xl shadow-sm">${w.svg}</div>
+            <div>
+              <div class="font-bold text-base flex items-center gap-1.5">
+                <span>${w.name}</span>
+                <span class="text-sm">${w.emoji}</span>
+              </div>
+              <div class="text-xs opacity-80 mt-0.5">${w.desc}</div>
+            </div>
+          </div>
+          <div class="text-xs font-bold px-2.5 py-1 rounded-lg ${isSelected ? 'bg-blue-600 text-white' : 'bg-white/50'}">
+            ${isSelected ? '✓ 已选' : '选择'}
+          </div>
+        `;
+        optionsContainer.appendChild(card);
+      });
+    }
+
+    function renderStatsView() {
+      const preCount = Object.keys(surveyData.pre).length;
+      const postCount = Object.keys(surveyData.post).length;
+
+      let improved = 0;
+      for (let i = 1; i <= TOTAL_STUDENTS; i++) {
+        const preVal = surveyData.pre[i];
+        const postVal = surveyData.post[i];
+        if (preVal && postVal && (postVal > preVal || postVal >= 4)) {
+          improved++;
+        }
+      }
+
+      document.getElementById('stat-pre-count').textContent = `${preCount} / ${TOTAL_STUDENTS}`;
+      document.getElementById('stat-post-count').textContent = `${postCount} / ${TOTAL_STUDENTS}`;
+      document.getElementById('stat-improved-count').textContent = `${improved} 人`;
+
+      // 统计各选项人数
+      const preCounts = [0, 0, 0, 0, 0];
+      const postCounts = [0, 0, 0, 0, 0];
+
+      Object.values(surveyData.pre).forEach(v => { if (v >= 1 && v <= 5) preCounts[v - 1]++; });
+      Object.values(surveyData.post).forEach(v => { if (v >= 1 && v <= 5) postCounts[v - 1]++; });
+
+      // 绘制图表
+      const ctx = document.getElementById('comparisonChart').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: WEATHER_OPTIONS.map(w => `${w.emoji} ${w.name}`),
+          datasets: [
+            {
+              label: '课前人数',
+              data: preCounts,
+              backgroundColor: 'rgba(59, 130, 246, 0.8)',
+              borderRadius: 8
+            },
+            {
+              label: '课后人数',
+              data: postCounts,
+              backgroundColor: 'rgba(16, 185, 129, 0.8)',
+              borderRadius: 8
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+          }
+        }
+      });
+
+      // 渲染明细表格
+      const tbody = document.getElementById('detail-table-body');
+      tbody.innerHTML = '';
+
+      for (let i = 1; i <= TOTAL_STUDENTS; i++) {
+        const preW = WEATHER_OPTIONS.find(w => w.id === surveyData.pre[i]);
+        const postW = WEATHER_OPTIONS.find(w => w.id === surveyData.post[i]);
+
+        let trendHtml = '<span class="text-slate-400">-</span>';
+        if (preW && postW) {
+          const diff = postW.id - preW.id;
+          if (diff > 0) trendHtml = `<span class="text-emerald-600 font-semibold">📈 心情放晴 (+${diff})</span>`;
+          else if (diff < 0) trendHtml = `<span class="text-rose-500 font-semibold">📉 状态回落 (${diff})</span>`;
+          else trendHtml = `<span class="text-blue-600">➡️ 保持不变</span>`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50";
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-bold text-slate-700">${i} 号</td>
+          <td class="py-3 px-4">${preW ? `<span class="px-2.5 py-1 rounded-full text-xs font-medium ${preW.badgeClass}">${preW.emoji} ${preW.name}</span>` : '<span class="text-slate-400">未填</span>'}</td>
+          <td class="py-3 px-4">${postW ? `<span class="px-2.5 py-1 rounded-full text-xs font-medium ${postW.badgeClass}">${postW.emoji} ${postW.name}</span>` : '<span class="text-slate-400">未填</span>'}</td>
+          <td class="py-3 px-4">${trendHtml}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function exportCSV() {
+      let csv = '\uFEFF学号,课前选项,课前分值(1-5),课后选项,课后分值(1-5),状态变化分值\n';
+      for (let i = 1; i <= TOTAL_STUDENTS; i++) {
+        const preW = WEATHER_OPTIONS.find(w => w.id === surveyData.pre[i]);
+        const postW = WEATHER_OPTIONS.find(w => w.id === surveyData.post[i]);
+        const preName = preW ? preW.name : '未填';
+        const preScore = preW ? preW.id : '';
+        const postName = postW ? postW.name : '未填';
+        const postScore = postW ? postW.id : '';
+        const diff = (preW && postW) ? (postW.id - preW.id) : '';
+        csv += `${i}号,${preName},${preScore},${postName},${postScore},${diff}\n`;
+      }
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `课堂心情气象统计_38人对比表.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function resetAllData() {
+      if (confirm('确定要清空所有 38 位同学的课前与课后数据吗？此操作不可恢复。')) {
+        surveyData = { pre: {}, post: {} };
+        saveData();
+        renderStatsView();
+      }
+    }
+
+    // 初始化启动
+    updateBadges();
+    renderCollectView();
+  </script>
+</body>
+</html>

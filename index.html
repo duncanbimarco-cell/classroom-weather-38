@@ -2,303 +2,388 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>课堂心情气象站 (38人版)</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="description" content="16个班级、每班38人，共608人的课前课后心情天气问卷与汇总统计。">
+  <title>课堂心情气象站 · 16班汇总版</title>
+  <script src="https://cdn.tailwindcss.com" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js" defer></script>
   <style>
-    .weather-card { transition: all 0.2s ease; }
-    .weather-card:hover { transform: translateY(-4px); }
-    .student-btn { transition: all 0.15s ease; }
-    .student-btn:active { transform: scale(0.95); }
+    :root{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:#1e293b;background:#f5f7fb;font-synthesis:none}*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.55}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #f59e0b;outline-offset:3px}[hidden]{display:none!important}h1,h2,h3,p{margin:0}h1{font-size:22px;font-weight:800}h2{font-size:19px;font-weight:750}h3{font-size:16px;font-weight:700}.shell{max-width:1240px;margin:auto;padding:22px 24px}.header{background:#fff;border-bottom:1px solid #e3e9f3}.flex-row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.brand{display:flex;align-items:center;gap:13px}.brand-icon{font-size:32px}.muted{color:#64748b;font-size:13px;line-height:1.8}.eyebrow{color:#2563eb;font-size:12px;letter-spacing:2px;font-weight:700}.pill{padding:8px 13px;border-radius:20px;background:#eff6ff;color:#2563eb;font-size:12px;font-weight:600}.tabs{display:flex;gap:5px;padding:5px;background:#eaf0f8;border-radius:13px;margin-top:22px}.tab{flex:1;padding:13px 8px;border:0;border-radius:10px;background:transparent;color:#64748b;font-weight:650;font-size:14px}.tab[aria-selected=true]{background:#2563eb;color:white;box-shadow:0 2px 6px #2563eb20}.tab small{font-size:11px;margin-left:4px;opacity:.85}.panel{background:#fff;border:1px solid #e4eaf3;border-radius:18px;padding:24px;box-shadow:0 4px 20px #33415504}.section-gap{margin-top:22px}.class-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:9px;margin-top:16px}.class-btn{border:1px solid #dfe6f0;border-radius:11px;padding:12px 4px;background:#f8fafc;color:#475569;font-weight:700}.class-btn small{display:block;font-weight:400;font-size:11px;margin-top:5px;color:#64748b}.class-btn[aria-pressed=true]{border:2px solid #2563eb;background:#eff6ff;color:#1d4ed8;padding:11px 3px}.class-btn.complete{box-shadow:inset 0 -3px #10b981}.layout{display:grid;grid-template-columns:minmax(0,7fr) minmax(300px,5fr);gap:22px;margin-top:22px}.student-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:9px;margin-top:20px}.student-btn{min-height:63px;border:2px solid #e2e8f0;border-radius:11px;background:#f8fafc;color:#64748b;font-size:14px;font-weight:700;transition:transform .15s}.student-btn:hover{transform:translateY(-2px)}.student-btn small{display:block;font-size:11px;font-weight:400;margin-top:3px}.student-btn.done{background:#ecfdf5;color:#047857;border-color:#a7f3d0}.student-btn[aria-pressed=true]{outline:3px solid #93c5fd;outline-offset:2px;border-color:#2563eb}.legend{font-size:12px;line-height:1.8;color:#64748b;margin-top:18px}.dot{display:inline-block;width:8px;height:8px;background:#10b981;border-radius:50%;margin-right:5px}.progress{height:7px;background:#e7eef9;border-radius:10px;overflow:hidden;margin-top:13px}.progress>span{height:100%;display:block;background:#2563eb;transition:width .2s}.weather-options{display:grid;gap:10px;margin-top:18px}.weather-card{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:2px solid #e2e8f0;border-radius:14px;padding:13px 15px;background:#f8fafc;color:#334155;transition:transform .15s}.weather-card:hover{transform:translateY(-2px)}.weather-card[aria-pressed=true]{border-color:#2563eb;box-shadow:0 0 0 2px #bfdbfe}.weather-card[data-weather="1"]{background:#f1f5f9}.weather-card[data-weather="2"]{background:#f3f5f8}.weather-card[data-weather="3"]{background:#f0f9ff}.weather-card[data-weather="4"]{background:#fffbeb}.weather-card[data-weather="5"]{background:linear-gradient(100deg,#fce7f3,#fff7df,#ecfeff)}.weather-svg{background:#ffffffb3;padding:5px;border-radius:10px;flex-shrink:0}.weather-svg svg{width:36px;height:36px}.weather-name{font-weight:750;font-size:15px}.weather-desc{font-size:11px;color:#64748b;margin-top:3px}.weather-value{margin-left:auto;white-space:nowrap;color:#64748b;font-size:12px}.tip{padding:12px 15px;background:#f0f9ff;border:1px solid #dbeafe;color:#386082;border-radius:11px;font-size:12px;line-height:1.8;margin-top:16px}.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.btn{padding:10px 14px;border:1px solid #dbe3ee;border-radius:10px;background:#fff;font-size:13px;font-weight:600;color:#475569}.btn.primary{background:#2563eb;border-color:#2563eb;color:#fff}.btn.green{background:#059669;border-color:#059669;color:#fff}.btn.danger{color:#be123c;border-color:#fecdd3;background:#fff1f2}.select,.input{border:1px solid #cbd5e1;border-radius:9px;padding:9px 11px;background:white;color:#334155;max-width:100%}.metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:20px 0}.metric{padding:18px;background:white;border:1px solid #e4eaf3;border-radius:14px}.metric strong{display:block;font-size:28px;margin-top:9px}.metric small{display:block;font-size:11px;color:#64748b;margin-top:4px}.up{color:#047857}.down{color:#be123c}.same{color:#2563eb}.chart-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:22px}.chart-wrap{position:relative;height:300px;margin-top:16px}.table-wrap{overflow:auto;max-height:540px;margin-top:16px}table{width:100%;border-collapse:collapse;font-size:13px;text-align:left;white-space:nowrap}td,th{padding:12px 14px;border-bottom:1px solid #edf1f6}th{background:#f1f5fa;color:#64748b;font-weight:650;position:sticky;top:0;z-index:1}tfoot td{font-weight:750;background:#eff6ff}tbody tr:hover{background:#f8fafc}.empty{text-align:center;padding:12px;font-size:13px;color:#64748b}.warning{padding:16px 18px;border:1px solid #fcd08e;background:#fffbeb;color:#92400e;border-radius:12px;font-size:13px;line-height:1.8;margin-bottom:18px}.footer{padding:24px 0 10px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#64748b;font-size:12px}.text-link{border:0;color:#2563eb;background:none;text-decoration:underline;text-underline-offset:3px;padding:3px}.data-tools{display:flex;gap:12px;flex-wrap:wrap;padding-top:15px;border-top:1px solid #e2e8f0;margin-top:18px}dialog{max-width:540px;width:calc(100% - 32px);max-height:90vh;overflow:auto;border:1px solid #e2e8f0;border-radius:20px;padding:26px;color:#1e293b;box-shadow:0 20px 90px #0f172a40}dialog::backdrop{background:#0f172a80;backdrop-filter:blur(3px)}.dialog-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;flex-wrap:wrap}.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);padding:14px 20px;border-radius:12px;background:#1e3a5f;color:white;font-size:14px;z-index:50;max-width:90%;box-shadow:0 5px 25px #0002}.scope-label{font-size:14px;font-weight:700}.filter-note{margin-top:8px;color:#64748b;font-size:12px;line-height:1.8}@media(max-width:1000px){.student-grid{grid-template-columns:repeat(6,1fr)}.metrics{grid-template-columns:repeat(3,1fr)}.chart-grid{grid-template-columns:1fr}}@media(max-width:760px){.layout{grid-template-columns:1fr}.class-grid{grid-template-columns:repeat(4,1fr)}.student-grid{grid-template-columns:repeat(8,1fr)}.shell{padding:18px}.panel{padding:20px}.header h1{font-size:20px}}@media(max-width:520px){.shell{padding:16px 12px}.panel{padding:17px}.student-grid{grid-template-columns:repeat(5,1fr)}.tab{font-size:12px}.tab small{display:block;margin-top:3px}.metrics{grid-template-columns:repeat(2,1fr);gap:9px}.metric{padding:14px}.metric strong{font-size:25px}.toolbar{gap:8px}.btn{font-size:12px;padding:10px 12px}.class-btn{font-size:13px}.chart-wrap{height:270px}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}
   </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-12">
-
-  <header class="bg-white shadow-sm sticky top-0 z-10">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <span class="text-3xl">🌤️</span>
-        <div>
-          <h1 class="text-xl font-bold text-slate-900">课堂心情气象站</h1>
-          <p class="text-xs text-slate-500">1-38号同学 课前 & 课后状态收集与对比</p>
-        </div>
-      </div>
-
-      <div class="flex bg-slate-100 p-1 rounded-xl">
-        <button onclick="switchTab('pre')" id="tab-pre" class="px-4 py-2 rounded-lg text-sm font-medium transition-all bg-blue-600 text-white shadow-sm">
-          🔔 课前收集 <span id="badge-pre" class="ml-1 px-1.5 py-0.5 text-xs bg-blue-500 rounded-full">0/38</span>
-        </button>
-        <button onclick="switchTab('post')" id="tab-post" class="px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900">
-          🎉 课后收集 <span id="badge-post" class="ml-1 px-1.5 py-0.5 text-xs bg-slate-200 text-slate-700 rounded-full">0/38</span>
-        </button>
-        <button onclick="switchTab('stats')" id="tab-stats" class="px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900">
-          📊 数据统计看板
-        </button>
-      </div>
+<body>
+<header class="header">
+  <div class="shell">
+    <div class="flex-row">
+      <div class="brand"><span class="brand-icon" aria-hidden="true">🌤️</span><div><h1>课堂心情气象站</h1><p class="muted">记录每个班级的天气，看见课前与课后的变化</p></div></div>
+      <span class="pill">16 个班级 · 每班 38 人 · 共 608 人</span>
     </div>
-  </header>
-
-  <main class="max-w-6xl mx-auto px-4 mt-6">
-    <div id="view-collect" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-bold flex items-center gap-2">
-            <span id="phase-title" class="text-blue-600">【课前阶段】</span> 请先点击你的学号：
-          </h2>
-          <div class="flex items-center gap-3 text-xs text-slate-500">
-            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> 已选</span>
-            <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-slate-200 inline-block"></span> 未选</span>
-          </div>
-        </div>
-        <div id="student-grid" class="grid grid-cols-5 sm:grid-cols-8 gap-2.5"></div>
-      </div>
-
-      <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
-            <div>
-              <p class="text-xs text-slate-400">当前选中学号</p>
-              <h3 id="selected-student-display" class="text-2xl font-extrabold text-blue-600">1 号同学</h3>
-            </div>
-            <div id="current-choice-tag" class="text-sm px-3 py-1 rounded-full bg-slate-100 text-slate-500">
-              尚未选择
-            </div>
-          </div>
-          <p class="text-sm font-medium text-slate-700 mb-3">请选择代表你此刻心情的天气图标：</p>
-          <div id="weather-options" class="space-y-3"></div>
-        </div>
-        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-          <span>💡 点击天气卡片即自动保存，并自动跳到下一位未填学号</span>
-        </div>
-      </div>
+    <nav class="tabs" role="tablist" aria-label="问卷阶段">
+      <button class="tab" id="tab-pre" role="tab" aria-controls="view-collect" aria-selected="true" data-tab="pre">🔔 课前收集 <small id="badge-pre">0/38</small></button>
+      <button class="tab" id="tab-post" role="tab" aria-controls="view-collect" aria-selected="false" tabindex="-1" data-tab="post">🎉 课后收集 <small id="badge-post">0/38</small></button>
+      <button class="tab" id="tab-stats" role="tab" aria-controls="view-stats" aria-selected="false" tabindex="-1" data-tab="stats">📊 数据统计看板</button>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+  <div id="storage-warning" class="warning" role="alert" hidden></div>
+  <section id="legacy-banner" class="warning" aria-label="旧版记录迁移" hidden>
+    <strong>检测到旧版单班问卷记录</strong>
+    <p id="legacy-description"></p>
+    <div class="toolbar" style="margin-top:10px"><label for="legacy-class">记录所属班级</label><select id="legacy-class" class="select"></select><button id="migrate-legacy" class="btn">将旧记录转入此班级</button></div>
+  </section>
+  <section id="view-collect" role="tabpanel" aria-labelledby="tab-pre">
+    <div class="panel">
+      <div class="flex-row"><div><div class="eyebrow">STEP 01 / 选择班级</div><h2 style="margin-top:6px">先确认你的班级</h2></div><p class="muted">每个班独立记录，同号学号不会混在一起。</p></div>
+      <div id="class-grid" class="class-grid" aria-label="填写班级"></div>
     </div>
-
-    <div id="view-stats" class="hidden space-y-6">
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-between gap-4">
-        <div class="flex flex-wrap gap-6">
-          <div>
-            <p class="text-xs text-slate-400">课前完成人数</p>
-            <p id="stat-pre-count" class="text-2xl font-bold text-blue-600">0 / 38</p>
-          </div>
-          <div>
-            <p class="text-xs text-slate-400">课后完成人数</p>
-            <p id="stat-post-count" class="text-2xl font-bold text-emerald-600">0 / 38</p>
-          </div>
-          <div>
-            <p class="text-xs text-slate-400">心情变好 / 保持晴朗彩虹</p>
-            <p id="stat-improved-count" class="text-2xl font-bold text-amber-500">0 人</p>
-          </div>
-        </div>
-        <div class="flex gap-3">
-          <button onclick="exportCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-xl shadow-sm transition flex items-center gap-1.5">
-            📥 导出 Excel (CSV) 统计表
-          </button>
-          <button onclick="resetAllData()" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-sm font-medium rounded-xl transition">
-            🗑️ 清空重置数据
-          </button>
-        </div>
-      </div>
-
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-        <h3 class="text-base font-bold mb-4">📈 课前 vs 课后 天气选项人数分布对比</h3>
-        <div class="h-72 w-full">
-          <canvas id="comparisonChart"></canvas>
-        </div>
-      </div>
-
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <h3 class="text-base font-bold mb-4">📋 1-38号同学 课前与课后详细数据表</h3>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse text-sm">
-            <thead>
-              <tr class="bg-slate-50 text-slate-600 border-b border-slate-200">
-                <th class="py-3 px-4 font-semibold">学号</th>
-                <th class="py-3 px-4 font-semibold">课前选择</th>
-                <th class="py-3 px-4 font-semibold">课后选择</th>
-                <th class="py-3 px-4 font-semibold">状态变化趋势</th>
-              </tr>
-            </thead>
-            <tbody id="detail-table-body" class="divide-y divide-slate-100"></tbody>
-          </table>
-        </div>
-      </div>
+    <div class="layout">
+      <section class="panel">
+        <div class="flex-row"><div><div class="eyebrow">STEP 02 / 选择学号</div><h2 id="phase-title" style="margin-top:6px">1 班 · 课前阶段</h2></div><span class="pill" id="phase-progress">0 / 38 人已填</span></div>
+        <div id="progress" class="progress" role="progressbar" aria-label="当前班级当前阶段完成进度" aria-valuemin="0" aria-valuemax="38" aria-valuenow="0"><span id="progress-fill"></span></div>
+        <div id="student-grid" class="student-grid" aria-label="学生学号"></div>
+        <p class="legend"><span class="dot"></span>绿色表示已填写，点击学号可修改。蓝色边框为当前学号。</p>
+      </section>
+      <section class="panel">
+        <div class="eyebrow">STEP 03 / 记录心情</div>
+        <div class="flex-row" style="margin-top:6px"><h2 id="selected-student-display">1 班 · 1 号同学</h2><span id="current-choice-tag" class="muted">尚未选择</span></div>
+        <p class="muted" style="margin-top:8px">选择最接近你此刻心情的天气，没有标准答案。</p>
+        <div id="weather-options" class="weather-options"></div>
+        <div id="collection-tip" class="tip">点击天气即保存，并选中本班下一位未填学号。</div>
+      </section>
     </div>
-  </main>
-
-  <script>
-    const TOTAL_STUDENTS = 38;
-    const STORAGE_KEY = 'classroom_weather_survey_38_v1';
-    const WEATHER_OPTIONS = [
+  </section>
+  <section id="view-stats" role="tabpanel" aria-labelledby="tab-stats" hidden>
+    <div class="panel">
+      <div class="flex-row"><div><h2>问卷汇总统计</h2><p class="muted">可查看单个班级，或一次汇总全部 16 个班。</p></div><div class="toolbar"><label for="stats-scope" class="scope-label">统计范围</label><select id="stats-scope" class="select"><option value="all">全部 16 个班（608 人）</option></select></div></div>
+      <div class="data-tools"><button id="export-detail" class="btn primary">↓ 导出当前范围明细 CSV</button><button id="export-summary" class="btn green">↓ 导出 16 班汇总 CSV</button><button id="export-backup" class="btn">备份全部数据</button><button id="import-backup" class="btn">恢复备份</button><input id="backup-file" type="file" accept=".json,application/json" hidden><button id="reset" class="btn danger">重置数据…</button></div>
+      <p id="scope-note" class="filter-note"></p>
+    </div>
+    <div id="metrics" class="metrics"></div>
+    <div class="chart-grid">
+      <section class="panel">
+        <h3 id="chart-title">全部 16 班 · 天气人数分布</h3><p class="muted">按已填写记录统计，未填写不计入任何天气。</p>
+        <div class="chart-wrap" id="chart-wrap"><canvas id="comparisonChart" role="img" aria-label="课前和课后天气人数分组柱状图，具体人数见相邻表格"></canvas></div>
+        <p class="warning" id="chart-error" hidden>图表未能加载，请联网后刷新。人数表和导出功能仍可使用。</p>
+        <p id="chart-empty" class="empty">还没有填写记录，完成问卷后将在此展示分布。</p>
+      </section>
+      <section class="panel"><h3>各天气人数与比例</h3><p class="muted">比例的分母为该阶段已填写人数。</p><div class="table-wrap"><table><thead><tr><th scope="col">天气</th><th scope="col">课前</th><th scope="col">课后</th></tr></thead><tbody id="distribution-body"></tbody></table></div><div class="tip" id="paired-note"></div></section>
+    </div>
+    <section class="panel section-gap"><div class="flex-row"><div><h3>16 个班级完成情况与变化汇总</h3><p class="muted">此表始终展示全部班级，点击班级名称可查看该班明细。</p></div><span class="pill" id="classes-complete">0 / 16 班全部完成</span></div><div class="table-wrap"><table><thead><tr><th scope="col">班级</th><th scope="col">课前提交</th><th scope="col">课后提交</th><th scope="col">前后已配对</th><th scope="col">上升</th><th scope="col">不变</th><th scope="col">下降</th><th scope="col">配对课前均值</th><th scope="col">配对课后均值</th><th scope="col">平均变化</th></tr></thead><tbody id="class-summary-body"></tbody><tfoot id="class-summary-total"></tfoot></table></div><p class="filter-note">“前后已配对”指同班同学号的两个阶段均已填写。均值和变化均只使用已配对记录；天气值 1–5 为问卷选项编码，不作心理诊断。</p></section>
+    <section class="panel section-gap"><div class="flex-row"><div><h3 id="detail-title">全部 16 班 · 608 人个人明细</h3><p class="muted">按班级、学号排序，包含未填写的同学。</p></div><span class="pill" id="detail-count">608 人</span></div><div class="table-wrap"><table><thead><tr><th scope="col">班级</th><th scope="col">学号</th><th scope="col">课前选择</th><th scope="col">课后选择</th><th scope="col">状态变化</th></tr></thead><tbody id="detail-table-body"></tbody></table></div></section>
+  </section>
+  <footer class="footer"><span id="save-status" role="status">● 数据保存在当前设备的浏览器中</span><span>统一在此设备填写 · 不跨设备同步 · 调查结束后请导出备份</span></footer>
+</main>
+<dialog id="confirm-dialog" aria-labelledby="confirm-title"><h2 id="confirm-title"></h2><p id="confirm-body" class="muted" style="margin-top:16px;white-space:pre-line"></p><div id="confirm-input-wrap" style="margin-top:18px" hidden><label for="confirm-input" class="muted">请输入“重置全部”以确认清空 16 个班：</label><input id="confirm-input" class="input" style="width:100%;margin-top:8px" autocomplete="off"></div><div class="dialog-actions"><button id="cancel-confirm" class="btn" autofocus>取消</button><button id="accept-confirm" class="btn primary">确认</button></div></dialog>
+<dialog id="reset-dialog" aria-labelledby="reset-title"><h2 id="reset-title">选择要重置的数据范围</h2><p class="muted" style="margin:14px 0">建议先导出备份。重置后，只有通过备份才能恢复。</p><label for="reset-scope" class="muted">重置范围</label><select id="reset-scope" class="select" style="width:100%;margin-top:8px"></select><div class="dialog-actions"><button id="cancel-reset" class="btn" autofocus>取消</button><button id="review-reset" class="btn danger">下一步，确认重置</button></div></dialog>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<noscript><p class="warning">请启用 JavaScript 以填写问卷和查看统计。</p></noscript>
+<script>
+'use strict';
+// GitHub Pages 静态单文件应用；无后端，也不会上传学生的问卷数据。
+const CLASS_COUNT = 16;
+const TOTAL_STUDENTS = 38;
+const STORAGE_KEY = 'classroom_weather_survey_16x38_v2';
+const LEGACY_KEY = 'classroom_weather_survey_38_v1';
+const WEATHER_OPTIONS = [
       { id: 1, name: '暴风雨', desc: '焦虑 / 烦躁 / 压力很大', emoji: '⛈️', color: 'from-slate-700 to-slate-900 text-white', badgeClass: 'bg-slate-800 text-white', svg: `<svg class="w-10 h-10" viewBox="0 0 64 64" fill="none"><path d="M46 26C46 18.268 39.732 12 32 12C25.39 12 19.85 16.57 18.39 22.72C13.62 23.47 10 27.59 10 32.5C10 37.99 14.5 42.5 20 42.5H45C50.52 42.5 55 38.02 55 32.5C55 27.35 50.89 23.16 45.8 23.01" fill="#475569"/><path d="M33 38L25 50H33L29 60L41 46H33L33 38Z" fill="#FACC15"/></svg>` },
       { id: 2, name: '多云', desc: '有点闷闷的 / 疲惫 / 提不起劲', emoji: '☁️', color: 'from-slate-200 to-slate-300 text-slate-800', badgeClass: 'bg-slate-300 text-slate-800', svg: `<svg class="w-10 h-10" viewBox="0 0 64 64" fill="none"><path d="M48 30C48 21.16 40.84 14 32 14C24.5 14 18.2 19.16 16.47 26.13C11.12 26.9 7 31.47 7 37C7 43.08 11.92 48 18 48H47C53.08 48 58 43.08 58 37C58 31.25 53.58 26.54 47.95 26.05" fill="#94A3B8"/></svg>` },
       { id: 3, name: '晴转多云', desc: '平静 / 普通 / 还算正常', emoji: '⛅', color: 'from-sky-100 to-amber-100 text-slate-800', badgeClass: 'bg-sky-100 text-sky-800', svg: `<svg class="w-10 h-10" viewBox="0 0 64 64" fill="none"><circle cx="24" cy="24" r="10" fill="#FBBF24"/><path d="M48 34C48 26.82 42.18 21 35 21C28.9 21 23.78 25.2 22.38 30.86C18.03 31.48 14.68 35.2 14.68 39.69C14.68 44.63 18.68 48.63 23.62 48.63H47.18C52.12 48.63 56.12 44.63 56.12 39.69C56.12 35.02 52.53 31.19 47.96 30.8" fill="#CBD5E1"/></svg>` },
       { id: 4, name: '晴朗', desc: '开心 / 专注 / 状态不错', emoji: '☀️', color: 'from-amber-200 to-orange-200 text-amber-950', badgeClass: 'bg-amber-200 text-amber-900', svg: `<svg class="w-10 h-10" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="14" fill="#F59E0B"/><path d="M32 8V14M32 50V56M8 32H14M50 32H56M15 15L19.5 19.5M44.5 44.5L49 49M49 15L44.5 19.5M19.5 44.5L15 49" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/></svg>` },
       { id: 5, name: '彩虹', desc: '超级棒 / 充满能量 / 收获满满', emoji: '🌈', color: 'from-pink-200 via-amber-100 to-cyan-200 text-slate-900', badgeClass: 'bg-gradient-to-r from-pink-500 to-cyan-500 text-white', svg: `<svg class="w-10 h-10" viewBox="0 0 64 64" fill="none"><path d="M10 46C10 33.85 19.85 24 32 24C44.15 24 54 33.85 54 46" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/><path d="M14 46C14 36.06 22.06 28 32 28C41.94 28 50 36.06 50 46" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/><path d="M18 46C18 38.27 24.27 32 32 32C39.73 32 46 38.27 46 46" stroke="#10B981" stroke-width="4" stroke-linecap="round"/><path d="M22 46C22 40.48 26.48 36 32 36C37.52 36 42 40.48 42 46" stroke="#3B82F6" stroke-width="4" stroke-linecap="round"/></svg>` }
     ];
-    let currentTab = 'pre';
-    let selectedStudent = 1;
-    let surveyData = loadData();
-    let chartInstance = null;
-    function loadData() {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) { try { return JSON.parse(raw); } catch (e) {} }
-      return { pre: {}, post: {} };
-    }
-    function saveData() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(surveyData));
-      updateBadges();
-    }
-    function switchTab(tab) {
-      currentTab = tab;
-      const btnPre = document.getElementById('tab-pre');
-      const btnPost = document.getElementById('tab-post');
-      const btnStats = document.getElementById('tab-stats');
-      [btnPre, btnPost, btnStats].forEach(b => { b.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900"; });
-      if (tab === 'pre') {
-        btnPre.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all bg-blue-600 text-white shadow-sm";
-        document.getElementById('phase-title').textContent = '【课前阶段】';
-        document.getElementById('phase-title').className = 'text-blue-600';
-        document.getElementById('view-collect').classList.remove('hidden');
-        document.getElementById('view-stats').classList.add('hidden');
-        renderCollectView();
-      } else if (tab === 'post') {
-        btnPost.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-sm";
-        document.getElementById('phase-title').textContent = '【课后阶段】';
-        document.getElementById('phase-title').className = 'text-emerald-600';
-        document.getElementById('view-collect').classList.remove('hidden');
-        document.getElementById('view-stats').classList.add('hidden');
-        renderCollectView();
-      } else {
-        btnStats.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all bg-indigo-600 text-white shadow-sm";
-        document.getElementById('view-collect').classList.add('hidden');
-        document.getElementById('view-stats').classList.remove('hidden');
-        renderStatsView();
-      }
-      updateBadges();
-    }
-    function updateBadges() {
-      document.getElementById('badge-pre').textContent = `${Object.keys(surveyData.pre).length}/${TOTAL_STUDENTS}`;
-      document.getElementById('badge-post').textContent = `${Object.keys(surveyData.post).length}/${TOTAL_STUDENTS}`;
-    }
-    function selectStudent(num) { selectedStudent = num; renderCollectView(); }
-    function chooseWeather(weatherId) {
-      surveyData[currentTab][selectedStudent] = weatherId;
-      saveData();
-      for (let i = 1; i <= TOTAL_STUDENTS; i++) {
-        const nextNum = ((selectedStudent + i - 1) % TOTAL_STUDENTS) + 1;
-        if (!surveyData[currentTab][nextNum]) { selectedStudent = nextNum; break; }
-      }
-      renderCollectView();
-    }
-    function renderCollectView() {
-      const grid = document.getElementById('student-grid');
-      grid.innerHTML = '';
-      const phaseData = surveyData[currentTab];
-      for (let i = 1; i <= TOTAL_STUDENTS; i++) {
-        const chosenId = phaseData[i];
-        const chosenWeather = WEATHER_OPTIONS.find(w => w.id === chosenId);
-        const isCurrent = (i === selectedStudent);
-        const btn = document.createElement('button');
-        let baseClass = "student-btn h-14 rounded-xl flex flex-col items-center justify-center font-bold border-2 ";
-        if (isCurrent) baseClass += "border-blue-600 ring-2 ring-blue-300 bg-blue-50 text-blue-700 ";
-        else if (chosenWeather) baseClass += "border-emerald-500 bg-emerald-50 text-emerald-800 ";
-        else baseClass += "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 ";
-        btn.className = baseClass;
-        btn.onclick = () => selectStudent(i);
-        btn.innerHTML = `<span class="text-sm">${i}号</span><span class="text-base leading-none mt-0.5">${chosenWeather ? chosenWeather.emoji : '·'}</span>`;
-        grid.appendChild(btn);
-      }
-      document.getElementById('selected-student-display').textContent = `${selectedStudent} 号同学`;
-      const currentWeatherId = phaseData[selectedStudent];
-      const currentWeather = WEATHER_OPTIONS.find(w => w.id === currentWeatherId);
-      const tagEl = document.getElementById('current-choice-tag');
-      if (currentWeather) {
-        tagEl.textContent = `已选：${currentWeather.emoji} ${currentWeather.name}`;
-        tagEl.className = `text-sm px-3 py-1 rounded-full font-medium ${currentWeather.badgeClass}`;
-      } else {
-        tagEl.textContent = '尚未选择';
-        tagEl.className = 'text-sm px-3 py-1 rounded-full bg-slate-100 text-slate-500';
-      }
-      const optionsContainer = document.getElementById('weather-options');
-      optionsContainer.innerHTML = '';
-      WEATHER_OPTIONS.forEach(w => {
-        const isSelected = (currentWeatherId === w.id);
-        const card = document.createElement('div');
-        card.onclick = () => chooseWeather(w.id);
-        card.className = `weather-card cursor-pointer p-3.5 rounded-2xl bg-gradient-to-r ${w.color} flex items-center justify-between border-2 ${isSelected ? 'border-blue-600 ring-2 ring-blue-400' : 'border-transparent'}`;
-        card.innerHTML = `<div class="flex items-center gap-3.5"><div class="bg-white/80 p-1.5 rounded-xl shadow-sm">${w.svg}</div><div><div class="font-bold text-base flex items-center gap-1.5"><span>${w.name}</span><span class="text-sm">${w.emoji}</span></div><div class="text-xs opacity-80 mt-0.5">${w.desc}</div></div></div><div class="text-xs font-bold px-2.5 py-1 rounded-lg ${isSelected ? 'bg-blue-600 text-white' : 'bg-white/50'}">${isSelected ? '✓ 已选' : '选择'}</div>`;
-        optionsContainer.appendChild(card);
-      });
-    }
-    function renderStatsView() {
-      const preCount = Object.keys(surveyData.pre).length;
-      const postCount = Object.keys(surveyData.post).length;
-      let improved = 0;
-      for (let i = 1; i <= TOTAL_STUDENTS; i++) {
-        if (surveyData.pre[i] && surveyData.post[i] && (surveyData.post[i] > surveyData.pre[i] || surveyData.post[i] >= 4)) improved++;
-      }
-      document.getElementById('stat-pre-count').textContent = `${preCount} / ${TOTAL_STUDENTS}`;
-      document.getElementById('stat-post-count').textContent = `${postCount} / ${TOTAL_STUDENTS}`;
-      document.getElementById('stat-improved-count').textContent = `${improved} 人`;
-      const preCounts = [0, 0, 0, 0, 0], postCounts = [0, 0, 0, 0, 0];
-      Object.values(surveyData.pre).forEach(v => { if (v >= 1 && v <= 5) preCounts[v - 1]++; });
-      Object.values(surveyData.post).forEach(v => { if (v >= 1 && v <= 5) postCounts[v - 1]++; });
-      const ctx = document.getElementById('comparisonChart').getContext('2d');
-      if (chartInstance) chartInstance.destroy();
-      chartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: WEATHER_OPTIONS.map(w => `${w.emoji} ${w.name}`),
-          datasets: [
-            { label: '课前人数', data: preCounts, backgroundColor: 'rgba(59, 130, 246, 0.8)', borderRadius: 8 },
-            { label: '课后人数', data: postCounts, backgroundColor: 'rgba(16, 185, 129, 0.8)', borderRadius: 8 }
-          ]
-        },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
-      });
-      const tbody = document.getElementById('detail-table-body');
-      tbody.innerHTML = '';
-      for (let i = 1; i <= TOTAL_STUDENTS; i++) {
-        const preW = WEATHER_OPTIONS.find(w => w.id === surveyData.pre[i]);
-        const postW = WEATHER_OPTIONS.find(w => w.id === surveyData.post[i]);
-        let trendHtml = '<span class="text-slate-400">-</span>';
-        if (preW && postW) {
-          const diff = postW.id - preW.id;
-          if (diff > 0) trendHtml = `<span class="text-emerald-600 font-semibold">📈 心情放晴 (+${diff})</span>`;
-          else if (diff < 0) trendHtml = `<span class="text-rose-500 font-semibold">📉 状态回落 (${diff})</span>`;
-          else trendHtml = `<span class="text-blue-600">➡️ 保持不变</span>`;
-        }
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50";
-        tr.innerHTML = `<td class="py-3 px-4 font-bold text-slate-700">${i} 号</td><td class="py-3 px-4">${preW ? `<span class="px-2.5 py-1 rounded-full text-xs font-medium ${preW.badgeClass}">${preW.emoji} ${preW.name}</span>` : '<span class="text-slate-400">未填</span>'}</td><td class="py-3 px-4">${postW ? `<span class="px-2.5 py-1 rounded-full text-xs font-medium ${postW.badgeClass}">${postW.emoji} ${postW.name}</span>` : '<span class="text-slate-400">未填</span>'}</td><td class="py-3 px-4">${trendHtml}</td>`;
-        tbody.appendChild(tr);
+const $ = id => document.getElementById(id);
+const classIds = () => Array.from({length: CLASS_COUNT}, (_, i) => i + 1);
+const createEmptyData = () => ({version: 2, classCount: CLASS_COUNT, studentsPerClass: TOTAL_STUDENTS, legacyImported: false, classes: Object.fromEntries(classIds().map(id => [id, {pre: {}, post: {}}]))});
+let currentTab = 'pre', currentClass = 1, selectedStudent = 1, statsScope = 'all';
+let surveyData = createEmptyData(), chartInstance = null, storageBlocked = false, legacyData = null, confirmAction = null, confirmNeedsText = false, toastTimer;
+const validValue = value => Number.isInteger(value) && value >= 1 && value <= 5;
+const isObject = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+function validatePhase(raw) {
+  if (!isObject(raw)) throw new Error('阶段数据格式不正确');
+  const result = {};
+  for (const [key, value] of Object.entries(raw)) {
+    const id = Number(key);
+    if (!Number.isInteger(id) || id < 1 || id > TOTAL_STUDENTS || String(id) !== key || !validValue(value)) throw new Error('学号或天气值超出范围');
+    result[id] = value;
+  }
+  return result;
+}
+function validateData(raw) {
+  if (!isObject(raw) || raw.version !== 2 || raw.classCount !== CLASS_COUNT || raw.studentsPerClass !== TOTAL_STUDENTS || !isObject(raw.classes) || Object.keys(raw.classes).length !== CLASS_COUNT) throw new Error('需要完整的 16 班、每班 38 人版本数据');
+  const result = createEmptyData();
+  result.legacyImported = raw.legacyImported === true;
+  for (const id of classIds()) {
+    if (!isObject(raw.classes[id])) throw new Error('缺少班级数据');
+    result.classes[id] = {pre: validatePhase(raw.classes[id].pre), post: validatePhase(raw.classes[id].post)};
+  }
+  return result;
+}
+function warn(text) { $('storage-warning').textContent = text; $('storage-warning').hidden = false; }
+function notify(text) { clearTimeout(toastTimer); $('toast').textContent = text; $('toast').hidden = false; toastTimer = setTimeout(() => $('toast').hidden = true, 3500); }
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    surveyData = raw ? validateData(JSON.parse(raw)) : createEmptyData();
+    storageBlocked = false;
+    $('storage-warning').hidden = true;
+  } catch (error) {
+    storageBlocked = true;
+    warn('本地记录无法读取，可能是浏览器存储受限或数据格式异常。为避免覆盖原数据，已暂停保存，请检查浏览器设置或通过备份恢复。');
+  }
+  legacyData = null;
+  try {
+    if (!surveyData.legacyImported) {
+      const raw = localStorage.getItem(LEGACY_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const candidate = {pre: validatePhase(parsed.pre), post: validatePhase(parsed.post)};
+        if (Object.keys(candidate.pre).length || Object.keys(candidate.post).length) legacyData = candidate;
       }
     }
-    function exportCSV() {
-      let csv = '\uFEFF学号,课前选项,课前分值(1-5),课后选项,课后分值(1-5),状态变化分值\n';
-      for (let i = 1; i <= TOTAL_STUDENTS; i++) {
-        const preW = WEATHER_OPTIONS.find(w => w.id === surveyData.pre[i]);
-        const postW = WEATHER_OPTIONS.find(w => w.id === surveyData.post[i]);
-        csv += `${i}号,${preW ? preW.name : '未填'},${preW ? preW.id : ''},${postW ? postW.name : '未填'},${postW ? postW.id : ''},${(preW && postW) ? (postW.id - preW.id) : ''}\n`;
-      }
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `课堂心情气象统计_38人对比表.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
+  } catch (error) { warn('旧版单班记录读取失败。原记录已保留；新版本不会覆盖旧版存储。'); }
+  renderLegacy();
+}
+function persist(next, {recover = false} = {}) {
+  if (storageBlocked && !recover) { notify('当前无法保存，请先处理页面上方的存储提示。'); return false; }
+  try {
+    const clean = validateData(next);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(clean));
+    surveyData = clean;
+    storageBlocked = false;
+    $('storage-warning').hidden = true;
+    $('save-status').textContent = '● 已保存至当前浏览器 · ' + new Date().toLocaleTimeString('zh-CN');
+    return true;
+  } catch (error) {
+    warn('保存失败，本次修改未生效。浏览器可能禁用了存储或空间不足；请备份已有记录并检查浏览器设置。');
+    notify('保存失败，本次记录未写入。');
+    return false;
+  }
+}
+function className(id) { return `${id} 班`; }
+function scopedIds(scope = statsScope) { return scope === 'all' ? classIds() : [Number(scope)]; }
+function scopeName(scope = statsScope) { return scope === 'all' ? '全部 16 班' : className(Number(scope)); }
+function aggregate(ids, source = surveyData) {
+  const result = {capacity: ids.length * TOTAL_STUDENTS, pre: 0, post: 0, paired: 0, up: 0, same: 0, down: 0, preCounts: [0,0,0,0,0], postCounts: [0,0,0,0,0], pairedPreSum: 0, pairedPostSum: 0};
+  for (const id of ids) for (let student = 1; student <= TOTAL_STUDENTS; student++) {
+    const record = source.classes[id], pre = record.pre[student], post = record.post[student];
+    if (pre) { result.pre++; result.preCounts[pre - 1]++; }
+    if (post) { result.post++; result.postCounts[post - 1]++; }
+    if (pre && post) {
+      result.paired++; result.pairedPreSum += pre; result.pairedPostSum += post;
+      result[post > pre ? 'up' : post < pre ? 'down' : 'same']++;
     }
-    function resetAllData() {
-      if (confirm('确定要清空所有 38 位同学的课前与课后数据吗？')) {
-        surveyData = { pre: {}, post: {} };
-        saveData();
-        renderStatsView();
-      }
-    }
-    updateBadges();
-    renderCollectView();
-  </script>
+  }
+  return result;
+}
+function percent(n, total) { return total ? (100 * n / total).toFixed(1) + '%' : '—'; }
+function mean(sum, n) { return n ? (sum / n).toFixed(2) : '—'; }
+function averageChange(stats) { return mean(stats.pairedPostSum - stats.pairedPreSum, stats.paired); }
+function weatherLabel(value) { const w = WEATHER_OPTIONS[value - 1]; return w ? `${w.emoji} ${w.name}` : '— 未填写'; }
+function trend(pre, post) {
+  if (!pre || !post) return {text: '待完成两个阶段', cls: 'muted', delta: ''};
+  const delta = post - pre;
+  return {text: delta > 0 ? `📈 上升 +${delta}` : delta < 0 ? `📉 下降 ${delta}` : '→ 保持不变', cls: delta > 0 ? 'up' : delta < 0 ? 'down' : 'same', delta};
+}
+function renderClasses() {
+  $('class-grid').innerHTML = classIds().map(id => {
+    const s = aggregate([id]);
+    return `<button class="class-btn ${s.paired === TOTAL_STUDENTS ? 'complete' : ''}" data-class="${id}" aria-pressed="${id === currentClass}" aria-label="${id}班，课前已填${s.pre}人，课后已填${s.post}人">${id} 班<small>前 ${s.pre}/38 · 后 ${s.post}/38</small></button>`;
+  }).join('');
+}
+function updateBadges() {
+  const records = surveyData.classes[currentClass];
+  $('badge-pre').textContent = `${currentClass}班 ${Object.keys(records.pre).length}/38`;
+  $('badge-post').textContent = `${currentClass}班 ${Object.keys(records.post).length}/38`;
+}
+function renderCollectView() {
+  const phase = currentTab === 'post' ? 'post' : 'pre';
+  const phaseLabel = phase === 'pre' ? '课前' : '课后';
+  const records = surveyData.classes[currentClass][phase], count = Object.keys(records).length;
+  $('phase-title').textContent = `${currentClass} 班 · ${phaseLabel}阶段`;
+  $('phase-progress').textContent = `${count} / 38 人已填`;
+  $('progress-fill').style.width = `${100 * count / TOTAL_STUDENTS}%`;
+  $('progress').setAttribute('aria-valuenow', count);
+  $('student-grid').innerHTML = Array.from({length: TOTAL_STUDENTS}, (_, i) => {
+    const id = i + 1, value = records[id];
+    return `<button class="student-btn ${value ? 'done' : ''}" data-student="${id}" aria-pressed="${id === selectedStudent}" aria-label="${id}号，${value ? '已填写' + WEATHER_OPTIONS[value - 1].name + '，点击修改' : '未填写'}">${id} 号<small>${value ? '✓ 已填' : '待填写'}</small></button>`;
+  }).join('');
+  $('selected-student-display').textContent = `${currentClass} 班 · ${selectedStudent} 号同学`;
+  const selected = records[selectedStudent];
+  $('current-choice-tag').textContent = selected ? `已选：${weatherLabel(selected)}` : '尚未选择';
+  $('weather-options').innerHTML = WEATHER_OPTIONS.map(w => `<button class="weather-card" data-weather="${w.id}" aria-pressed="${selected === w.id}" aria-label="${w.name}，状态值${w.id}"><span class="weather-svg" aria-hidden="true">${w.svg}</span><span><span class="weather-name">${w.name} ${w.emoji}</span><span class="weather-desc" style="display:block">${w.desc}</span></span><span class="weather-value">${selected === w.id ? '✓ 已选' : '选择'} · ${w.id}</span></button>`).join('');
+  $('collection-tip').textContent = count === TOTAL_STUDENTS ? `${currentClass} 班的${phaseLabel}问卷已全部完成。可点击学号修改，或切换下一班。` : '点击天气即保存，并选中本班下一位未填学号。';
+}
+function selectClass(id) {
+  currentClass = id;
+  const phase = currentTab === 'post' ? 'post' : 'pre';
+  selectedStudent = Array.from({length: TOTAL_STUDENTS}, (_, i) => i + 1).find(n => !surveyData.classes[id][phase][n]) || 1;
+  renderClasses(); updateBadges(); renderCollectView();
+}
+function chooseWeather(value) {
+  if (!['pre', 'post'].includes(currentTab) || !validValue(value)) return;
+  const id = currentClass, student = selectedStudent, next = structuredClone(surveyData);
+  next.classes[id][currentTab][student] = value;
+  if (!persist(next)) return;
+  for (let i = 1; i <= TOTAL_STUDENTS; i++) {
+    const n = (student + i - 1) % TOTAL_STUDENTS + 1;
+    if (!surveyData.classes[id][currentTab][n]) { selectedStudent = n; break; }
+  }
+  renderClasses(); updateBadges(); renderCollectView();
+  document.querySelector(`[data-student="${selectedStudent}"]`).focus({preventScroll: true});
+  notify(`${id} 班 ${student} 号的${currentTab === 'pre' ? '课前' : '课后'}记录已保存`);
+}
+function renderStatsView() {
+  const ids = scopedIds(), s = aggregate(ids);
+  $('stats-scope').value = statsScope;
+  $('scope-note').textContent = `当前范围：${scopeName()}，应填 ${s.capacity} 人。明细 CSV 按此范围导出；16 班汇总 CSV 始终包含全部班级及合计。`;
+  const cards = [['课前已填写', s.pre, `/ ${s.capacity} 人 · ${percent(s.pre,s.capacity)}`, 'same'], ['课后已填写', s.post, `/ ${s.capacity} 人 · ${percent(s.post,s.capacity)}`, 'up'], ['前后已配对', s.paired, '两个阶段均已填写', ''], ['状态上升', s.up, `占已配对 ${percent(s.up,s.paired)}`, 'up'], ['保持不变', s.same, `占已配对 ${percent(s.same,s.paired)}`, 'same'], ['状态下降', s.down, `占已配对 ${percent(s.down,s.paired)}`, 'down']];
+  $('metrics').innerHTML = cards.map(([title,value,sub,cls]) => `<div class="metric"><p class="muted">${title}</p><strong class="${cls}">${value}</strong><small>${sub}</small></div>`).join('');
+  $('chart-title').textContent = `${scopeName()} · 天气人数分布`;
+  $('distribution-body').innerHTML = WEATHER_OPTIONS.map((w, i) => `<tr><td>${w.emoji} ${w.name}</td><td>${s.preCounts[i]} 人 · ${percent(s.preCounts[i],s.pre)}</td><td>${s.postCounts[i]} 人 · ${percent(s.postCounts[i],s.post)}</td></tr>`).join('');
+  $('paired-note').textContent = s.paired ? `已配对 ${s.paired} 人：课前平均值 ${mean(s.pairedPreSum,s.paired)}，课后平均值 ${mean(s.pairedPostSum,s.paired)}，平均变化 ${averageChange(s)}。只比较同一批学生，未填写不按 0 分计算。` : '暂无前后均已填写的记录。只有同班同学号的两个阶段都完成后，才计算状态变化。';
+  let complete = 0;
+  $('class-summary-body').innerHTML = classIds().map(id => { const item = aggregate([id]); if (item.paired === TOTAL_STUDENTS) complete++; return summaryHtml(`<button class="text-link" data-scope="${id}">${id} 班</button>`, item); }).join('');
+  $('classes-complete').textContent = `${complete} / 16 班全部完成`;
+  $('class-summary-total').innerHTML = summaryHtml('全部合计', aggregate(classIds()));
+  const rows = [];
+  for (const id of ids) for (let n = 1; n <= TOTAL_STUDENTS; n++) {
+    const {pre, post} = surveyData.classes[id], t = trend(pre[n],post[n]);
+    rows.push(`<tr><td>${id} 班</td><td>${n} 号</td><td>${weatherLabel(pre[n])}</td><td>${weatherLabel(post[n])}</td><td class="${t.cls}">${t.text}</td></tr>`);
+  }
+  $('detail-table-body').innerHTML = rows.join('');
+  $('detail-title').textContent = `${scopeName()} · ${s.capacity} 人个人明细`;
+  $('detail-count').textContent = `${s.capacity} 人`;
+  renderChart(s);
+}
+function summaryHtml(name, s) {
+  return `<tr><td>${name}</td><td>${s.pre}/${s.capacity} · ${percent(s.pre,s.capacity)}</td><td>${s.post}/${s.capacity} · ${percent(s.post,s.capacity)}</td><td>${s.paired}</td><td class="up">${s.up}</td><td class="same">${s.same}</td><td class="down">${s.down}</td><td>${mean(s.pairedPreSum,s.paired)}</td><td>${mean(s.pairedPostSum,s.paired)}</td><td>${averageChange(s)}</td></tr>`;
+}
+function renderChart(s) {
+  $('chart-empty').hidden = s.pre + s.post > 0;
+  const missing = typeof Chart === 'undefined';
+  $('chart-error').hidden = !missing; $('chart-wrap').hidden = missing;
+  if (missing) return;
+  if (chartInstance) { chartInstance.data.datasets[0].data = s.preCounts; chartInstance.data.datasets[1].data = s.postCounts; chartInstance.update(); return; }
+  chartInstance = new Chart($('comparisonChart'), {type:'bar', data:{labels: WEATHER_OPTIONS.map(w => w.name), datasets:[{label:'课前人数',data:s.preCounts,backgroundColor:'#6097ed',borderRadius:5,maxBarThickness:42},{label:'课后人数',data:s.postCounts,backgroundColor:'#40b995',borderRadius:5,maxBarThickness:42}]}, options:{responsive:true,maintainAspectRatio:false,animation:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? false : {duration:200},plugins:{legend:{position:'top',labels:{usePointStyle:true,boxWidth:8}},tooltip:{callbacks:{label:context => `${context.dataset.label}：${context.parsed.y} 人`}}},scales:{y:{beginAtZero:true,suggestedMax:5,ticks:{precision:0},title:{display:true,text:'人数'},grid:{color:'#edf1f6'}},x:{grid:{display:false},ticks:{font:{size:11}}}}}});
+}
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('[data-tab]').forEach(b => { const active = b.dataset.tab === tab; b.setAttribute('aria-selected',String(active)); b.tabIndex = active ? 0 : -1; });
+  $('view-collect').hidden = tab === 'stats'; $('view-stats').hidden = tab !== 'stats';
+  if (tab === 'stats') renderStatsView();
+  else { $('view-collect').setAttribute('aria-labelledby','tab-' + tab); renderClasses(); renderCollectView(); }
+  updateBadges();
+}
+function csvCell(value) { return '"' + String(value).replace(/"/g,'""') + '"'; }
+function csvText(rows) { return '\uFEFF' + rows.map(row => row.map(csvCell).join(',')).join('\r\n'); }
+function detailRows(ids) {
+  const rows = [['班级','学号','课前选择','课前数值(1-5)','课后选择','课后数值(1-5)','状态变化','变化值(课后-课前)']];
+  for (const id of ids) for (let n = 1; n <= TOTAL_STUDENTS; n++) {
+    const pre = surveyData.classes[id].pre[n], post = surveyData.classes[id].post[n];
+    rows.push([`${id}班`,n,pre ? WEATHER_OPTIONS[pre-1].name : '未填写',pre || '',post ? WEATHER_OPTIONS[post-1].name : '未填写',post || '',trend(pre,post).text,trend(pre,post).delta]);
+  }
+  return rows;
+}
+function summaryRows() {
+  const rows = [['班级','应填人数','课前提交人数','课前完成率','课后提交人数','课后完成率','前后配对人数','上升人数','不变人数','下降人数','配对课前均值','配对课后均值','配对平均变化',...WEATHER_OPTIONS.map(w=>'课前'+w.name+'人数'),...WEATHER_OPTIONS.map(w=>'课后'+w.name+'人数')]];
+  for (const id of [...classIds(),'all']) {
+    const s = aggregate(id === 'all' ? classIds() : [id]);
+    rows.push([id === 'all' ? '全部合计' : `${id}班`,s.capacity,s.pre,percent(s.pre,s.capacity),s.post,percent(s.post,s.capacity),s.paired,s.up,s.same,s.down,mean(s.pairedPreSum,s.paired),mean(s.pairedPostSum,s.paired),averageChange(s),...s.preCounts,...s.postCounts]);
+  }
+  return rows;
+}
+function timeStamp() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}_${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}${String(d.getSeconds()).padStart(2,'0')}`; }
+function download(content, type, filename) {
+  const url = URL.createObjectURL(new Blob([content],{type})), a = document.createElement('a');
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url),10000);
+}
+function requestConfirm({title,body,action,label = '确认',danger = false,requireText = false}) {
+  $('confirm-title').textContent = title; $('confirm-body').textContent = body;
+  $('confirm-input-wrap').hidden = !requireText; $('confirm-input').value = '';
+  $('accept-confirm').textContent = label; $('accept-confirm').className = `btn ${danger ? 'danger' : 'primary'}`;
+  $('accept-confirm').disabled = requireText; confirmNeedsText = requireText; confirmAction = action;
+  $('confirm-dialog').showModal();
+}
+function renderLegacy() {
+  $('legacy-banner').hidden = !legacyData || surveyData.legacyImported;
+  if (legacyData) $('legacy-description').textContent = `旧记录有课前 ${Object.keys(legacyData.pre).length} 人、课后 ${Object.keys(legacyData.post).length} 人。请选择原记录所属班级；旧版源数据会保留。`;
+}
+function migrateLegacy() {
+  if (!legacyData) return;
+  const id = Number($('legacy-class').value); let conflicts = 0;
+  for (const phase of ['pre','post']) for (const [student,value] of Object.entries(legacyData[phase])) if (surveyData.classes[id][phase][student] && surveyData.classes[id][phase][student] !== value) conflicts++;
+  requestConfirm({title:`将旧记录转入 ${id} 班？`,body:`将旧版记录标记为 ${id} 班的数据。${conflicts ? `有 ${conflicts} 条与本班已有选择不同，将以旧版记录为准。` : '本班其他已填记录会保留。'}旧版源数据不会删除。`,label:'确认转入',action:() => {
+    const next = structuredClone(surveyData);
+    for (const phase of ['pre','post']) Object.assign(next.classes[id][phase],legacyData[phase]);
+    next.legacyImported = true;
+    if (!persist(next)) return false;
+    legacyData = null; renderLegacy(); switchTab(currentTab); notify(`旧记录已转入 ${id} 班`); return true;
+  }});
+}
+async function readBackup(file) {
+  if (!file) return;
+  if (file.size > 1024 * 1024) { notify('备份文件过大，请选择本应用导出的 JSON 文件。'); return; }
+  let imported;
+  try { const raw = JSON.parse(await file.text()); if (raw.app !== 'classroom-weather-16x38' || !raw.data) throw new Error(); imported = validateData(raw.data); }
+  catch (error) { notify('备份格式不正确，未修改任何数据。'); return; }
+  const s = aggregate(classIds(),imported);
+  requestConfirm({title:'用备份恢复全部 16 班记录？',body:`备份包含课前 ${s.pre} 人、课后 ${s.post} 人。恢复会替换当前全部记录，建议先备份当前数据。`,label:'确认恢复备份',action:() => {
+    imported.legacyImported = true;
+    if (!persist(imported,{recover:true})) return false;
+    legacyData = null; renderLegacy(); switchTab(currentTab); notify('全部 16 班的备份已恢复'); return true;
+  }});
+}
+function reviewReset() {
+  const scope = $('reset-scope').value, all = scope === 'all'; $('reset-dialog').close();
+  requestConfirm({title:all ? '确认重置全部 16 个班？' : `确认重置 ${scope} 班？`,body:all ? '将清空 608 位同学的全部课前、课后记录。请先备份，需要恢复时可导入备份文件。' : `仅清空 ${scope} 班 38 位同学的课前、课后记录，其他 15 个班保留。`,label:all ? '重置全部数据' : '重置此班',danger:true,requireText:all,action:() => {
+    const next = structuredClone(surveyData);
+    for (const id of scopedIds(scope)) next.classes[id] = {pre:{},post:{}};
+    if (all) next.legacyImported = true;
+    if (!persist(next)) return false;
+    renderLegacy(); switchTab(currentTab); notify(all ? '16 个班的数据已重置' : `${scope} 班的数据已重置`); return true;
+  }});
+}
+// 事件绑定。测试只复用上方纯数据函数，网页不内置测试数据。
+function initialize() {
+  const options = classIds().map(id => `<option value="${id}">${id} 班</option>`).join('');
+  $('stats-scope').insertAdjacentHTML('beforeend',options); $('legacy-class').innerHTML = options;
+  $('reset-scope').innerHTML = options + '<option value="all">全部 16 班（608 人）</option>';
+  document.querySelectorAll('[data-tab]').forEach(button => {
+    button.addEventListener('click',() => switchTab(button.dataset.tab));
+    button.addEventListener('keydown',event => {
+      const tabs = [...document.querySelectorAll('[data-tab]')], i = tabs.indexOf(button); let n;
+      if (event.key === 'ArrowRight') n = (i+1)%3; if (event.key === 'ArrowLeft') n = (i+2)%3;
+      if (event.key === 'Home') n = 0; if (event.key === 'End') n = 2;
+      if (n !== undefined) { event.preventDefault(); tabs[n].focus(); switchTab(tabs[n].dataset.tab); }
+    });
+  });
+  $('class-grid').addEventListener('click',event => { const b = event.target.closest('[data-class]'); if (b) selectClass(Number(b.dataset.class)); });
+  $('student-grid').addEventListener('click',event => { const b = event.target.closest('[data-student]'); if (b) { selectedStudent = Number(b.dataset.student); renderCollectView(); document.querySelector(`[data-student="${selectedStudent}"]`).focus({preventScroll:true}); } });
+  $('weather-options').addEventListener('click',event => { const b = event.target.closest('[data-weather]'); if (b) chooseWeather(Number(b.dataset.weather)); });
+  $('stats-scope').addEventListener('change',event => { statsScope = event.target.value; renderStatsView(); });
+  $('class-summary-body').addEventListener('click',event => { const b = event.target.closest('[data-scope]'); if (b) { statsScope = b.dataset.scope; renderStatsView(); $('stats-scope').focus(); } });
+  $('export-detail').addEventListener('click',() => { download(csvText(detailRows(scopedIds())),'text/csv;charset=utf-8;',`心情问卷_${scopeName()}_个人明细_${timeStamp()}.csv`); notify('个人明细 CSV 已导出'); });
+  $('export-summary').addEventListener('click',() => { download(csvText(summaryRows()),'text/csv;charset=utf-8;',`心情问卷_16班汇总_${timeStamp()}.csv`); notify('16 班汇总 CSV 已导出'); });
+  $('export-backup').addEventListener('click',() => { download(JSON.stringify({app:'classroom-weather-16x38',exportedAt:new Date().toISOString(),data:surveyData},null,2),'application/json',`心情问卷_16班完整备份_${timeStamp()}.json`); notify('全部数据备份已导出'); });
+  $('import-backup').addEventListener('click',() => $('backup-file').click());
+  $('backup-file').addEventListener('change',event => { const file = event.target.files[0]; event.target.value = ''; readBackup(file); });
+  $('migrate-legacy').addEventListener('click',migrateLegacy);
+  $('reset').addEventListener('click',() => { $('reset-scope').value = statsScope === 'all' ? String(currentClass) : statsScope; $('reset-dialog').showModal(); });
+  $('cancel-reset').addEventListener('click',() => $('reset-dialog').close()); $('review-reset').addEventListener('click',reviewReset);
+  $('cancel-confirm').addEventListener('click',() => $('confirm-dialog').close());
+  $('confirm-dialog').addEventListener('close',() => { confirmAction = null; });
+  $('confirm-input').addEventListener('input',() => { $('accept-confirm').disabled = confirmNeedsText && $('confirm-input').value !== '重置全部'; });
+  $('accept-confirm').addEventListener('click',() => { if (confirmNeedsText && $('confirm-input').value !== '重置全部') return; if (confirmAction && confirmAction() !== false) $('confirm-dialog').close(); });
+  window.addEventListener('storage',event => {
+    if (event.key !== STORAGE_KEY && event.key !== LEGACY_KEY && event.key !== null) return;
+    $('confirm-dialog').close(); $('reset-dialog').close(); loadData(); switchTab(currentTab); notify('已同步此浏览器其他标签页的更新');
+  });
+  window.addEventListener('load',() => { if (currentTab === 'stats') renderStatsView(); });
+  loadData(); switchTab('pre');
+}
+initialize();
+</script>
 </body>
 </html>
